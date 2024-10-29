@@ -1,1 +1,1 @@
-Georgia was here
+Run `pip3 install -r requirements.txt`
