@@ -20,7 +20,7 @@ https://nodejs.org/en
 `pip3 install -r requirements.txt`
 
 ### Run
-`python app.py`
+`python3 app.py`
 
 `cd frontend`
 `npm install`
