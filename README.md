@@ -13,3 +13,7 @@ Activate the environment
 Install requirements
 
 `pip3 install -r requirements.txt`
+
+
+To start
+'python app.py'
