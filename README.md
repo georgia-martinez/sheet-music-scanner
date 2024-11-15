@@ -13,3 +13,11 @@ Activate the environment
 Install requirements
 
 `pip3 install -r requirements.txt`
+
+### Run
+`python app.py`
+
+`cd frontend`
+`npm install`
+`npm start`
+
