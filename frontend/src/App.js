@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import * as Tone from "tone";
+import './App.css'
 
 const App = () => {
   const [message, setMessage] = useState("");
@@ -57,13 +58,13 @@ const App = () => {
         <h1>React and Flask Integration</h1>
         <input type="file" onChange={handleFileUpload} />
         <p>{message}</p>
-        <button onClick={playNoteA}>A</button>
-        <button onClick={playNoteB}>B</button>
-        <button onClick={playNoteC}>C</button>
-        <button onClick={playNoteD}>D</button>
-        <button onClick={playNoteE}>E</button>
-        <button onClick={playNoteF}>F</button>
-        <button onClick={playNoteG}>G</button>
+        <button class="white-key" onClick={playNoteA}>A</button>
+        <button class="white-key" onClick={playNoteB}>B</button>
+        <button class="white-key" onClick={playNoteC}>C</button>
+        <button class="white-key" onClick={playNoteD}>D</button>
+        <button class="white-key" onClick={playNoteE}>E</button>
+        <button class="white-key" onClick={playNoteF}>F</button>
+        <button class="white-key" onClick={playNoteG}>G</button>
       </div>
   );
 };
