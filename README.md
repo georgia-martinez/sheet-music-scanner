@@ -17,6 +17,10 @@ Download node
 
 https://nodejs.org/en
 
+Download poppler 
+
+`brew install poppler`
+`
 `pip3 install -r requirements.txt`
 
 ### Run
