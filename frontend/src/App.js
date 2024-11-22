@@ -35,6 +35,7 @@ const App = () => {
 
   const synth = new Tone.Synth().toDestination();
 
+
   const playNoteA = () => {
     synth.triggerAttackRelease("A3", "8n");
   }
@@ -68,13 +69,24 @@ const App = () => {
         <h1>Sheet Music Scanner</h1>
         <input type="file" onChange={handleFileUpload} />
         <p>{message}</p>
-        <button class="white-key" onClick={playNoteA}>A</button>
-        <button class="white-key" onClick={playNoteB}>B</button>
-        <button class="white-key" onClick={playNoteC}>C</button>
-        <button class="white-key" onClick={playNoteD}>D</button>
         <button class="white-key" onClick={playNoteE}>E</button>
-        <button class="white-key" onClick={playNoteF}>F</button>
-        <button class="white-key" onClick={playNoteG}>G</button>
+        <button class="white-key" onClick={playNoteF}>F
+          <button class="black-key">F#</button>
+        </button>
+        <button class="white-key" onClick={playNoteG}>G
+          <button class="black-key">G#</button>
+        </button>
+        <button class="white-key" onClick={playNoteA}>A
+          <button class="black-key">A#</button>
+        </button>
+        <button class="white-key" onClick={playNoteB}>B</button>
+        <button class="white-key" onClick={playNoteC}>C
+          <button class="black-key">C#</button>
+        </button>
+        <button class="white-key" onClick={playNoteD}>D
+          <button class="black-key">D#</button>
+        </button>
+        <button class="white-key" onClick={playNoteE}>E</button>
         {lineCount !== null && <p>Horizontal Lines Detected: {lineCount}</p>}
       </div>
   );
