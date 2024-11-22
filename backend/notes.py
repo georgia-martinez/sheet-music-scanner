@@ -1,6 +1,47 @@
 import cv2
 import numpy as np
 
+def note_boxes(image_url, debug=False):
+    main_image = cv2.imread(image_url, cv2.IMREAD_COLOR)
+    pattern_image = cv2.imread("note_head.png", cv2.IMREAD_COLOR)
+
+    main_gray = cv2.cvtColor(main_image, cv2.COLOR_BGR2GRAY)
+    pattern_gray = cv2.cvtColor(pattern_image, cv2.COLOR_BGR2GRAY)
+
+    result = cv2.matchTemplate(main_gray, pattern_gray, cv2.TM_CCOEFF_NORMED)
+
+    threshold = 0.3
+    locations = np.where(result >= threshold)
+
+    scale = 0.4
+
+    resized_pattern = cv2.resize(pattern_gray, None, fx=scale, fy=scale, interpolation=cv2.INTER_AREA)
+
+    result = cv2.matchTemplate(main_gray, resized_pattern, cv2.TM_CCOEFF_NORMED)
+    locations = np.where(result >= threshold)
+
+    boxes = []
+
+    for pt in zip(*locations[::-1]):
+        bottom_right = (pt[0] + resized_pattern.shape[1], pt[1] + resized_pattern.shape[0])
+        boxes.append([pt[0], pt[1], bottom_right[0], bottom_right[1]])
+
+    # Apply Non-Maximum Suppression
+    filtered_boxes = non_max_suppression(boxes, overlap_thresh=0.2)
+
+    if debug:
+        print(f"Notes found: {len(filtered_boxes)}")
+
+        # Draw rectangles for filtered matches
+        for (x1, y1, x2, y2) in filtered_boxes:
+            cv2.rectangle(main_image, (x1, y1), (x2, y2), (0, 255, 0), 2)
+
+        cv2.imshow('Matches', main_image)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+
+    return filtered_boxes
+
 def non_max_suppression(boxes, overlap_thresh):
     if len(boxes) == 0:
         return []
@@ -34,40 +75,3 @@ def non_max_suppression(boxes, overlap_thresh):
         order = order[np.where(overlap <= overlap_thresh)[0] + 1]
 
     return boxes[keep]
-
-main_image = cv2.imread("test.png", cv2.IMREAD_COLOR)
-pattern_image = cv2.imread("note_head.png", cv2.IMREAD_COLOR)
-
-main_gray = cv2.cvtColor(main_image, cv2.COLOR_BGR2GRAY)
-pattern_gray = cv2.cvtColor(pattern_image, cv2.COLOR_BGR2GRAY)
-
-result = cv2.matchTemplate(main_gray, pattern_gray, cv2.TM_CCOEFF_NORMED)
-
-threshold = 0.3
-locations = np.where(result >= threshold)
-
-scale = 0.4
-
-resized_pattern = cv2.resize(pattern_gray, None, fx=scale, fy=scale, interpolation=cv2.INTER_AREA)
-
-result = cv2.matchTemplate(main_gray, resized_pattern, cv2.TM_CCOEFF_NORMED)
-locations = np.where(result >= threshold)
-
-boxes = []
-
-for pt in zip(*locations[::-1]):
-    bottom_right = (pt[0] + resized_pattern.shape[1], pt[1] + resized_pattern.shape[0])
-    boxes.append([pt[0], pt[1], bottom_right[0], bottom_right[1]])
-
-# Apply Non-Maximum Suppression
-filtered_boxes = non_max_suppression(boxes, overlap_thresh=0.2)
-
-print(len(filtered_boxes))
-
-# Draw rectangles for filtered matches
-for (x1, y1, x2, y2) in filtered_boxes:
-    cv2.rectangle(main_image, (x1, y1), (x2, y2), (0, 255, 0), 2)
-
-cv2.imshow('Matches', main_image)
-cv2.waitKey(0)
-cv2.destroyAllWindows()

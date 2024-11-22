@@ -32,7 +32,7 @@ def staff_y_coords(image_url, debug=False):
     space_y_coords = staff_space_y_coords(line_y_coords)
 
     result = (line_y_coords + space_y_coords)
-    result.sort()
+    result.sort(reverse=True)
 
     return result
 
