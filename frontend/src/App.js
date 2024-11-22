@@ -5,6 +5,7 @@ import './App.css'
 
 const App = () => {
   const [message, setMessage] = useState("");
+  const [lineCount, setLineCount] = useState(null);
 
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
