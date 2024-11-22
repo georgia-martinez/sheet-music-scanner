@@ -25,6 +25,7 @@ const App = () => {
 
   const synth = new Tone.Synth().toDestination();
 
+
   const playNoteA = () => {
     synth.triggerAttackRelease("A3", "8n");
   }

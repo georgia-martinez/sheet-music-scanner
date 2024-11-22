@@ -12,6 +12,7 @@ body {
   background-color: var(--white-key-color);
   height: 50vh;
   width: 5vw;
+  text-align: center;
 }
 
 .black-key {
@@ -19,6 +20,8 @@ body {
   height: 25vh;
   width: 3vw;
   z-index: 2;
-  position: absolute;
-  left: 100px;
+  position: relative;
+  left: 50%;
+  bottom: 25%;
+  color: var(--white-key-color);
 }
