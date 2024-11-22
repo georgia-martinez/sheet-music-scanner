@@ -58,13 +58,24 @@ const App = () => {
         <h1>React and Flask Integration</h1>
         <input type="file" onChange={handleFileUpload} />
         <p>{message}</p>
-        <button class="white-key" onClick={playNoteA}>A</button>
-        <button class="white-key" onClick={playNoteB}>B</button>
-        <button class="white-key" onClick={playNoteC}>C</button>
-        <button class="white-key" onClick={playNoteD}>D</button>
         <button class="white-key" onClick={playNoteE}>E</button>
-        <button class="white-key" onClick={playNoteF}>F</button>
-        <button class="white-key" onClick={playNoteG}>G</button>
+        <button class="white-key" onClick={playNoteF}>F
+          <button class="black-key">F#</button>
+        </button>
+        <button class="white-key" onClick={playNoteG}>G
+          <button class="black-key">G#</button>
+        </button>
+        <button class="white-key" onClick={playNoteA}>A
+          <button class="black-key">A#</button>
+        </button>
+        <button class="white-key" onClick={playNoteB}>B</button>
+        <button class="white-key" onClick={playNoteC}>C
+          <button class="black-key">C#</button>
+        </button>
+        <button class="white-key" onClick={playNoteD}>D
+          <button class="black-key">D#</button>
+        </button>
+        <button class="white-key" onClick={playNoteE}>E</button>
       </div>
   );
 };

@@ -9,7 +9,16 @@ body {
 }
 
 .white-key {
-  background-color: --white-key-color;
+  background-color: var(--white-key-color);
   height: 50vh;
   width: 5vw;
+}
+
+.black-key {
+  background-color: var(--black-key-color);
+  height: 25vh;
+  width: 3vw;
+  z-index: 2;
+  position: absolute;
+  left: 100px;
 }
