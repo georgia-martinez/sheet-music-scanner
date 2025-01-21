@@ -34,59 +34,43 @@ const App = () => {
   };
 
   const synth = new Tone.Synth().toDestination();
+  const polySynth = new Tone.PolySynth(Tone.Synth).toDestination();
 
+  // Tone.Transport.bpm.value = 120; how to set & use bpm 
 
-  const playNoteA = () => {
-    synth.triggerAttackRelease("A3", "8n");
-  }
+  // const chordTest = () => {
+  //   polySynth.triggerAttackRelease(["C4", "E4", "G4"], "2n");
+  // }
 
-  const playNoteB = () => {
-    synth.triggerAttackRelease("B3", "8n");
-  }
-
-  const playNoteC = () => {
-    synth.triggerAttackRelease("C4", "8n");
-  }
-
-  const playNoteD = () => {
-    synth.triggerAttackRelease("D4", "8n");
-  }
-
-  const playNoteE = () => {
-    synth.triggerAttackRelease("E4", "8n");
-  }
-
-  const playNoteF = () => {
-    synth.triggerAttackRelease("F4", "8n");
-  }
-
-  const playNoteG = () => {
-    synth.triggerAttackRelease("G4", "8n");
-  }
+  // const playNote = (note, duration) => {
+  //   return () => {
+  //     synth.triggerAttackRelease(note, duration);
+  //   };
+  // }
 
   return (
       <div>
         <h1>Sheet Music Scanner</h1>
         <input type="file" onChange={handleFileUpload} />
         <p>{message}</p>
-        <button class="white-key" onClick={playNoteE}>E</button>
-        <button class="white-key" onClick={playNoteF}>F
+        <button class="white-key">E</button>
+        <button class="white-key">F
           <button class="black-key">F#</button>
         </button>
-        <button class="white-key" onClick={playNoteG}>G
+        <button class="white-key">G
           <button class="black-key">G#</button>
         </button>
-        <button class="white-key" onClick={playNoteA}>A
+        <button class="white-key">A
           <button class="black-key">A#</button>
         </button>
-        <button class="white-key" onClick={playNoteB}>B</button>
-        <button class="white-key" onClick={playNoteC}>C
+        <button class="white-key" >B</button>
+        <button class="white-key">C
           <button class="black-key">C#</button>
         </button>
-        <button class="white-key" onClick={playNoteD}>D
+        <button class="white-key">D
           <button class="black-key">D#</button>
         </button>
-        <button class="white-key" onClick={playNoteE}>E</button>
+        <button class="white-key">E</button>
         {lineCount !== null && <p>Horizontal Lines Detected: {lineCount}</p>}
       </div>
   );
