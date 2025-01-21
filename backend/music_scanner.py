@@ -3,8 +3,8 @@ from notes import note_boxes
 
 
 def scan_music(image_url):
-  y_coords = staff_y_coords(image_url, True)
-  notes_boxes = note_boxes(image_url, True)
+  y_coords = staff_y_coords(image_url)
+  notes_boxes = note_boxes(image_url)
 
   note_letters = ["E4", "F4", "G4", "A4", "B4", "C5", "D5", "E5", "F5"]
 

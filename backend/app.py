@@ -24,7 +24,7 @@ def process_image():
 
         music = scan_music(file_path)
 
-        return jsonify({"music": music})
+        return jsonify(music)
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
