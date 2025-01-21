@@ -25,3 +25,11 @@ https://nodejs.org/en
 `cd frontend`
 `npm install`
 `npm start`
+
+
+### Database
+
+run all previous steps then do
+
+`psql -U postgres -d music_processor`
+password: `postgres`

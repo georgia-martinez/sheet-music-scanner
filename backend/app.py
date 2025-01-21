@@ -1,6 +1,7 @@
 import os
 import cv2
 import numpy as np
+from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from datetime import datetime
@@ -10,7 +11,6 @@ app = Flask(__name__)
 CORS(app)
 
 # Database configuration
-## TODO Figure out shit shit
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:Atomic1@localhost/music_processor'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
