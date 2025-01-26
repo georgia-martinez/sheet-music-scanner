@@ -7,6 +7,13 @@ const App = () => {
   const [message, setMessage] = useState("");
   const [lineCount, setLineCount] = useState(null);
 
+  const synth = new Tone.Synth().toDestination();
+
+  const song_json = {
+      "bpm": 90,
+      "notes": [ { "note": "A4", "duration": "4n", "time": 1}]
+  }
+
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -33,20 +40,12 @@ const App = () => {
     }
   };
 
-  const synth = new Tone.Synth().toDestination();
-  const polySynth = new Tone.PolySynth(Tone.Synth).toDestination();
+  function parseJSON(example_json){
+    var note = example_json.notes[0].note;
+    var duration = example_json.notes[0].duration;
+  }
 
-  // Tone.Transport.bpm.value = 120; how to set & use bpm 
 
-  // const chordTest = () => {
-  //   polySynth.triggerAttackRelease(["C4", "E4", "G4"], "2n");
-  // }
-
-  // const playNote = (note, duration) => {
-  //   return () => {
-  //     synth.triggerAttackRelease(note, duration);
-  //   };
-  // }
 
   return (
       <div>
