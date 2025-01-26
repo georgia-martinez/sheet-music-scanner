@@ -32,7 +32,15 @@ def staff_y_coords(image_url, debug=False):
     space_y_coords = staff_space_y_coords(line_y_coords)
 
     result = (line_y_coords + space_y_coords)
-    result.sort(reverse=True)
+    result.sort()
+
+    if debug:
+        for y in result:
+            cv2.line(image, (0, int(y)), (image.shape[1], int(y)), (0, 255, 0), 1)
+
+        cv2.imshow("Result with Staff Lines", image)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
 
     return result
 

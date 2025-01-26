@@ -3,21 +3,17 @@ import numpy as np
 
 def note_boxes(image_url, debug=False):
     main_image = cv2.imread(image_url, cv2.IMREAD_COLOR)
-    pattern_image = cv2.imread("note_head.png", cv2.IMREAD_COLOR)
+    pattern_image = cv2.imread("templates/quarter-note.png", cv2.IMREAD_COLOR)
 
     main_gray = cv2.cvtColor(main_image, cv2.COLOR_BGR2GRAY)
     pattern_gray = cv2.cvtColor(pattern_image, cv2.COLOR_BGR2GRAY)
 
-    result = cv2.matchTemplate(main_gray, pattern_gray, cv2.TM_CCOEFF_NORMED)
-
-    threshold = 0.3
-    locations = np.where(result >= threshold)
-
-    scale = 0.4
+    scale = 1.2
 
     resized_pattern = cv2.resize(pattern_gray, None, fx=scale, fy=scale, interpolation=cv2.INTER_AREA)
-
     result = cv2.matchTemplate(main_gray, resized_pattern, cv2.TM_CCOEFF_NORMED)
+
+    threshold = 0.3
     locations = np.where(result >= threshold)
 
     boxes = []
@@ -26,8 +22,8 @@ def note_boxes(image_url, debug=False):
         bottom_right = (pt[0] + resized_pattern.shape[1], pt[1] + resized_pattern.shape[0])
         boxes.append([pt[0], pt[1], bottom_right[0], bottom_right[1]])
 
-    # Apply Non-Maximum Suppression
-    filtered_boxes = non_max_suppression(boxes, overlap_thresh=0.2)
+    # Apply Non-Maximum Suppression to remove overlaps
+    filtered_boxes = non_max_suppression(boxes, 0.1)
 
     if debug:
         print(f"Notes found: {len(filtered_boxes)}")
@@ -52,26 +48,40 @@ def non_max_suppression(boxes, overlap_thresh):
     x2 = boxes[:, 2]
     y2 = boxes[:, 3]
 
-    # Compute the area of the rectangles
-    areas = (x2 - x1 + 1) * (y2 - y1 + 1)
-    order = np.argsort(areas)[::-1]  # Sort by area
+    # Compute the centroids of the boxes
+    centroids = np.stack([(x1 + x2) / 2, (y1 + y2) / 2], axis=1)
 
+    # Initialize the list to keep indices of selected boxes
     keep = []
-    while order.size > 0:
-        i = order[0]
+    visited = np.zeros(len(boxes), dtype=bool)
+
+    for i in range(len(boxes)):
+        if visited[i]:
+            continue
         keep.append(i)
+        visited[i] = True
 
-        # Compute overlap
-        xx1 = np.maximum(x1[i], x1[order[1:]])
-        yy1 = np.maximum(y1[i], y1[order[1:]])
-        xx2 = np.minimum(x2[i], x2[order[1:]])
-        yy2 = np.minimum(y2[i], y2[order[1:]])
+        # Compute distances from the current box to all other boxes
+        distances = np.linalg.norm(centroids - centroids[i], axis=1)
 
-        w = np.maximum(0, xx2 - xx1 + 1)
-        h = np.maximum(0, yy2 - yy1 + 1)
-        overlap = (w * h) / areas[order[1:]]
+        # Sort by distances (closest to the current box)
+        order = np.argsort(distances)
 
-        # Suppress boxes with overlap higher than threshold
-        order = order[np.where(overlap <= overlap_thresh)[0] + 1]
+        # Check overlaps for boxes in sorted order
+        for j in order:
+            if visited[j] or j == i:
+                continue
+            xx1 = max(x1[i], x1[j])
+            yy1 = max(y1[i], y1[j])
+            xx2 = min(x2[i], x2[j])
+            yy2 = min(y2[i], y2[j])
+
+            w = max(0, xx2 - xx1 + 1)
+            h = max(0, yy2 - yy1 + 1)
+            overlap = (w * h) / ((x2[j] - x1[j] + 1) * (y2[j] - y1[j] + 1))
+
+            # Suppress boxes with overlap higher than threshold
+            if overlap > overlap_thresh:
+                visited[j] = True
 
     return boxes[keep]
