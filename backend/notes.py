@@ -5,7 +5,6 @@ import numpy as np
 def remove_staff_lines(image_url):
     image = cv2.imread(image_url)
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    # _, binary_image = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
     line_image, lines = horizontal_lines(gray, 100, 0, 0)
 
@@ -22,11 +21,17 @@ def remove_staff_lines(image_url):
 
     return final
 
-def get_closer(boxed_noteheads):    
-    for image in boxed_noteheads:
-        print(image.shape)
+def get_closer(main_image, boxed_noteheads):
+    notehead_centers = []
 
-        _, thresh = cv2.threshold(image, 1, 255, cv2.THRESH_BINARY_INV)
+    print(len(boxed_noteheads))
+
+    for box in boxed_noteheads:
+        x1, y1, x2, y2 = box
+
+        cropped_image = main_image[y1:y2, x1:x2]
+
+        _, thresh = cv2.threshold(cropped_image, 1, 255, cv2.THRESH_BINARY_INV)
 
         contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
@@ -40,18 +45,22 @@ def get_closer(boxed_noteheads):
         else:
             cX, cY = 0, 0
 
-        print(f"{cX}, {cY}")
+        notehead_centers.append((cX + x1, cY + y1))
 
-        color_image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
+        print(f"centerX={cX + x1} centerY={cY + y1}")
 
-        cv2.circle(color_image, (cX, cY), 1, (0, 0, 255), thickness=10)
+        # color_image = cv2.cvtColor(cropped_image, cv2.COLOR_GRAY2BGR)
 
-        cv2.imshow("Image with Center", color_image)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
+        # cv2.circle(color_image, (cX, cY), 1, (0, 0, 255), thickness=10)
 
+        # cv2.imshow("Image with Center", color_image)
+        # cv2.waitKey(0)
+        # cv2.destroyAllWindows()
+
+    return notehead_centers
 
 def note_boxes(image_url, debug=False):
+    original_image = cv2.imread(image_url)
     main_image = cv2.cvtColor(remove_staff_lines(image_url), cv2.COLOR_BGR2GRAY)
 
     pattern_image = cv2.imread("templates/quarter-note.png", cv2.IMREAD_COLOR)
@@ -72,30 +81,29 @@ def note_boxes(image_url, debug=False):
         boxes.append([pt[0], pt[1], bottom_right[0], bottom_right[1]])
 
     # Apply Non-Maximum Suppression to remove overlaps
-    filtered_boxes = non_max_suppression(boxes, 0.1)
+    filtered_boxes = non_max_suppression(boxes, 0.1).tolist()
+    filtered_boxes.sort(key=lambda box: box[0])
 
-    boxed_noteheads = []
+    print(filtered_boxes)
 
-    for box in filtered_boxes:
-        x1, y1, x2, y2 = box
-
-        cropped_image = main_image[y1:y2, x1:x2]
-        boxed_noteheads.append(cropped_image)
-
-    get_closer(boxed_noteheads)
+    notehead_centers = get_closer(main_image, filtered_boxes)
 
     if debug:
         print(f"Notes found: {len(filtered_boxes)}")
 
         # Draw rectangles for filtered matches
         for (x1, y1, x2, y2) in filtered_boxes:
-            cv2.rectangle(main_image, (x1, y1), (x2, y2), (0, 255, 0), 2)
+            cv2.rectangle(original_image, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
-        cv2.imshow('Matches', main_image)
+        # Draw center of notehead
+        for (x, y) in notehead_centers:
+            cv2.circle(original_image, (x, y), 1, (0, 0, 255), thickness=10)
+
+        cv2.imshow('Matches', original_image)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
-    return filtered_boxes
+    return notehead_centers
 
 def non_max_suppression(boxes, overlap_thresh):
     if len(boxes) == 0:
