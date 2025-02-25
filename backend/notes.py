@@ -44,17 +44,10 @@ def get_closer(boxed_noteheads):
 
         color_image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
 
-        # Draw a fat red circle at the center
-        color_image = cv2.circle(color_image, (cX, cY), 30, (0, 0, 255), thickness=10)
+        cv2.circle(color_image, (cX, cY), 1, (0, 0, 255), thickness=10)
 
-        # Show the original image with the circle drawn
         cv2.imshow("Image with Center", color_image)
-        cv2.waitKey(0)  # Wait for a key press to proceed
-
-        # image = cv2.circle(image, (cX, cY), 100, (0, 0, 255), thickness=10)
-
-        # cv2.imshow("Image with center", image)
-        # cv2.waitKey(0)
+        cv2.waitKey(0)
         cv2.destroyAllWindows()
 
 
