@@ -1,8 +1,31 @@
+from staff import horizontal_lines
 import cv2
 import numpy as np
 
+def remove_staff_lines(image_url):
+    image = cv2.imread(image_url)
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    # _, binary_image = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+
+    line_image, lines = horizontal_lines(gray, 100, 0, 0)
+
+    final = image.copy()
+
+    # Remove the detected lines by masking them out
+    for line in lines:
+        x1, y1, x2, y2 = line
+        cv2.line(final, (x1, y1), (x2, y2), (255, 255, 255), 2)  # White line to remove
+
+    # Show the final result with horizontal lines removed
+    cv2.imshow(f"Horizontal Lines Removed", final)
+    cv2.waitKey(0)
+
+    return final
+
 def note_boxes(image_url, debug=False):
     main_image = cv2.imread(image_url, cv2.IMREAD_COLOR)
+    # main_image = cv2.cvtColor(remove_staff_lines(image_url), cv2.COLOR_BGR2GRAY)
+
     pattern_image = cv2.imread("templates/quarter-note.png", cv2.IMREAD_COLOR)
 
     main_gray = cv2.cvtColor(main_image, cv2.COLOR_BGR2GRAY)

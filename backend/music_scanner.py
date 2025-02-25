@@ -1,6 +1,5 @@
-from staff import staff_y_coords
+from staff import staff_y_coords, remove_staff_lines
 from notes import note_boxes
-
 
 def scan_music(image_url):
   y_coords = staff_y_coords(image_url, True)
@@ -39,3 +38,4 @@ def scan_music(image_url):
 
 if __name__ == "__main__":
   scan_music("test.png")
+  # remove_staff_lines("test.png")

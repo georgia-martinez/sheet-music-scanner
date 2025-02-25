@@ -2,16 +2,33 @@ import cv2
 import numpy as np
 
 
+def remove_staff_lines(image_url):
+    image = cv2.imread(image_url)
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    _, binary_image = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+
+    line_image, lines = horizontal_lines(binary_image, 100, 0, 0)
+
+    final = image.copy()
+
+    # Remove the detected lines by masking them out
+    for line in lines:
+        x1, y1, x2, y2 = line
+        cv2.line(final, (x1, y1), (x2, y2), (255, 255, 255), 2)  # White line to remove
+
+    # Show the final result with horizontal lines removed
+    cv2.imshow(f"Horizontal Lines Removed", final)
+    cv2.waitKey(0)
+
 def staff_y_coords(image_url, debug=False):
     """
     Returns the y coords for the 5 lines in the staff
     """
 
     image = cv2.imread(image_url)
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-    open_cv_image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
-
-    line_image, lines = horizontal_lines(open_cv_image)
+    line_image, lines = horizontal_lines(gray)
 
     if debug:
         cv2.imshow(f"Horizontal Lines", line_image)
@@ -80,15 +97,15 @@ def group_and_average(values, n):
     
     return grouped_values
 
-def horizontal_lines(image, min_line_length=100, max_line_gap=20):
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    edges = cv2.Canny(gray, 50, 150, apertureSize=3)
+def horizontal_lines(image, threshold=100, min_line_length=100, max_line_gap=20):
+    # gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    edges = cv2.Canny(image, 50, 150, apertureSize=3)
 
     lines = cv2.HoughLinesP(
         edges,
         rho=1,
         theta=np.pi / 180,
-        threshold=100,
+        threshold=threshold,
         minLineLength=min_line_length,
         maxLineGap=max_line_gap
     )
