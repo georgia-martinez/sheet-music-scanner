@@ -22,19 +22,52 @@ def remove_staff_lines(image_url):
 
     return final
 
+def get_closer(boxed_noteheads):    
+    for image in boxed_noteheads:
+        print(image.shape)
+
+        _, thresh = cv2.threshold(image, 1, 255, cv2.THRESH_BINARY_INV)
+
+        contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+        largest_contour = max(contours, key=cv2.contourArea)
+
+        M = cv2.moments(largest_contour)
+
+        if M['m00'] != 0:
+            cX = int(M['m10'] / M['m00'])
+            cY = int(M['m01'] / M['m00'])
+        else:
+            cX, cY = 0, 0
+
+        print(f"{cX}, {cY}")
+
+        color_image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
+
+        # Draw a fat red circle at the center
+        color_image = cv2.circle(color_image, (cX, cY), 30, (0, 0, 255), thickness=10)
+
+        # Show the original image with the circle drawn
+        cv2.imshow("Image with Center", color_image)
+        cv2.waitKey(0)  # Wait for a key press to proceed
+
+        # image = cv2.circle(image, (cX, cY), 100, (0, 0, 255), thickness=10)
+
+        # cv2.imshow("Image with center", image)
+        # cv2.waitKey(0)
+        cv2.destroyAllWindows()
+
+
 def note_boxes(image_url, debug=False):
-    main_image = cv2.imread(image_url, cv2.IMREAD_COLOR)
-    # main_image = cv2.cvtColor(remove_staff_lines(image_url), cv2.COLOR_BGR2GRAY)
+    main_image = cv2.cvtColor(remove_staff_lines(image_url), cv2.COLOR_BGR2GRAY)
 
     pattern_image = cv2.imread("templates/quarter-note.png", cv2.IMREAD_COLOR)
-
-    main_gray = cv2.cvtColor(main_image, cv2.COLOR_BGR2GRAY)
     pattern_gray = cv2.cvtColor(pattern_image, cv2.COLOR_BGR2GRAY)
 
     scale = 1.2
 
     resized_pattern = cv2.resize(pattern_gray, None, fx=scale, fy=scale, interpolation=cv2.INTER_AREA)
-    result = cv2.matchTemplate(main_gray, resized_pattern, cv2.TM_CCOEFF_NORMED)
+    result = cv2.matchTemplate(main_image, resized_pattern, cv2.TM_CCOEFF_NORMED)
 
     threshold = 0.3
     locations = np.where(result >= threshold)
@@ -47,6 +80,16 @@ def note_boxes(image_url, debug=False):
 
     # Apply Non-Maximum Suppression to remove overlaps
     filtered_boxes = non_max_suppression(boxes, 0.1)
+
+    boxed_noteheads = []
+
+    for box in filtered_boxes:
+        x1, y1, x2, y2 = box
+
+        cropped_image = main_image[y1:y2, x1:x2]
+        boxed_noteheads.append(cropped_image)
+
+    get_closer(boxed_noteheads)
 
     if debug:
         print(f"Notes found: {len(filtered_boxes)}")
