@@ -1,6 +1,6 @@
 import cv2
 
-from staff import staff_y_coords
+from staff import staff_y_coords, remove_staff_lines
 from notes import notehead_coords
 
 def scan_music(image_url, debug=False):
@@ -8,7 +8,9 @@ def scan_music(image_url, debug=False):
   image_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
   y_coords = staff_y_coords(image_gray, debug)
-  noteheads = notehead_coords(image_gray, debug)
+
+  image_no_staff = remove_staff_lines(image_gray, debug)
+  noteheads = notehead_coords(image_no_staff, debug)
 
   note_letters = ["E4", "F4", "G4", "A4", "B4", "C5", "D5", "E5", "F5"]
   note_letters.reverse()

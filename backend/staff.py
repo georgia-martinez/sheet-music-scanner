@@ -73,3 +73,17 @@ def group_and_average(values, n):
         grouped_values[-1] = int(np.mean([grouped_values[-1], last]))
     
     return grouped_values
+
+def remove_staff_lines(image, debug):
+    lines = horizontal_lines(image, 100, 0, 0)
+    image_no_staff = image.copy()
+
+    if lines:
+        for x1, y1, x2, y2 in lines:
+            cv2.line(image_no_staff, (x1, y1), (x2, y2), 255, 2)
+
+    if (debug):
+        cv2.imshow("Remove Staff Lines", image_no_staff)
+        cv2.waitKey(0)
+
+    return image_no_staff
