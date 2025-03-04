@@ -2,6 +2,15 @@ import cv2
 import numpy as np
 
 def get_closer(main_image, boxed_noteheads):
+    """
+    Given an image and a list of boxes notehead coords, returns a list containing 
+    the center of each found notehead
+
+    :param main_image: main image for cropping boxed portions out
+    :boxed_noteheads: list of boxes around noteheads  [(x1, y1, x2, y2), (...), etc...)
+    :return: notehead centers [(x, y), (...), etc...]
+    """
+
     notehead_centers = []
 
     for box in boxed_noteheads:
@@ -28,6 +37,13 @@ def get_closer(main_image, boxed_noteheads):
     return notehead_centers
 
 def notehead_coords(image, debug):
+    """
+    Returns coordinates of any found noteheads
+
+    :param image:
+    :return: list of notehead coords e.g. [(x1, y1, x2, y2), (...), etc...]
+    """
+
     pattern_image = cv2.imread("templates/quarter-note.png", cv2.IMREAD_COLOR)
     pattern_gray = cv2.cvtColor(pattern_image, cv2.COLOR_BGR2GRAY)
 

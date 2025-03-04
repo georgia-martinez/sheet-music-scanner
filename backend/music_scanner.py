@@ -1,10 +1,10 @@
 import cv2
 
-from staff import staff_y_coords, remove_staff_lines
+from staff import staff_y_coords, remove_staff
 from notes import notehead_coords
 
 def scan_music(image_url, debug=False):
-  image = cv2.imread(image_url)
+  image = cv2.imread(image_url, cv2.IMREAD_COLOR)
 
   # Convert to gray for preprocessing
   image_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -13,13 +13,12 @@ def scan_music(image_url, debug=False):
 
   # Remove staff lines before trying to find notes
   # Standard step in OMR projects
-  # TODO: Revisit to improve algorithm
-  image_no_staff = remove_staff_lines(image_gray, debug)
+  image_no_staff = remove_staff(image_gray, debug)
 
   noteheads = notehead_coords(image_no_staff, debug)
 
-  # Having the notes in this order is more human readable
-  # but OpenCV has (0, 0) in top left, higher the note -> lower y value
+  # Having the notes in this order is more readable
+  # Reversed b/c OpenCV has (0, 0) in top left, higher the note -> lower y value
   note_letters = ["E4", "F4", "G4", "A4", "B4", "C5", "D5", "E5", "F5"]
   note_letters.reverse()
 
