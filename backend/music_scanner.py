@@ -5,13 +5,21 @@ from notes import notehead_coords
 
 def scan_music(image_url, debug=False):
   image = cv2.imread(image_url)
+
+  # Convert to gray for preprocessing
   image_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
   y_coords = staff_y_coords(image_gray, debug)
 
+  # Remove staff lines before trying to find notes
+  # Standard step in OMR projects
+  # TODO: Revisit to improve algorithm
   image_no_staff = remove_staff_lines(image_gray, debug)
+
   noteheads = notehead_coords(image_no_staff, debug)
 
+  # Having the notes in this order is more human readable
+  # but OpenCV has (0, 0) in top left, higher the note -> lower y value
   note_letters = ["E4", "F4", "G4", "A4", "B4", "C5", "D5", "E5", "F5"]
   note_letters.reverse()
 
