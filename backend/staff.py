@@ -1,21 +1,14 @@
 import cv2
 import numpy as np
 
+from utils import horizontal_lines
 
-def staff_y_coords(image_url, debug=False):
+def staff_y_coords(image, debug):
     """
     Returns the y coords for the 5 lines in the staff
     """
 
-    image = cv2.imread(image_url)
-
-    open_cv_image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
-
-    line_image, lines = horizontal_lines(open_cv_image)
-
-    if debug:
-        cv2.imshow(f"Horizontal Lines", line_image)
-        cv2.waitKey(0)
+    lines = horizontal_lines(image, 100, 100, 20)
 
     line_y_coords = set()
 
@@ -31,10 +24,19 @@ def staff_y_coords(image_url, debug=False):
 
     space_y_coords = staff_space_y_coords(line_y_coords)
 
-    result = (line_y_coords + space_y_coords)
-    result.sort(reverse=True)
+    all_y_coords = (line_y_coords + space_y_coords)
+    all_y_coords.sort()
 
-    return result
+    if debug:
+        color_image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
+
+        for y in all_y_coords:
+            cv2.line(color_image, (0, int(y)), (color_image.shape[1], int(y)), (0, 255, 0), 1)
+
+        cv2.imshow("Staff Lines Found", color_image)
+        cv2.waitKey(0)
+
+    return all_y_coords
 
 def staff_space_y_coords(line_y_coords):
     result = []
@@ -72,28 +74,16 @@ def group_and_average(values, n):
     
     return grouped_values
 
-def horizontal_lines(image, min_line_length=100, max_line_gap=20):
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    edges = cv2.Canny(gray, 50, 150, apertureSize=3)
+def remove_staff_lines(image, debug):
+    lines = horizontal_lines(image, 100, 0, 0)
+    image_no_staff = image.copy()
 
-    lines = cv2.HoughLinesP(
-        edges,
-        rho=1,
-        theta=np.pi / 180,
-        threshold=100,
-        minLineLength=min_line_length,
-        maxLineGap=max_line_gap
-    )
-    
-    line_image = image.copy()
-    horizontal_lines = []
+    if lines:
+        for x1, y1, x2, y2 in lines:
+            cv2.line(image_no_staff, (x1, y1), (x2, y2), 255, 2)
 
-    if lines is not None:
-        for line in lines:
-            x1, y1, x2, y2 = line[0]
+    if (debug):
+        cv2.imshow("Remove Staff Lines", image_no_staff)
+        cv2.waitKey(0)
 
-            if abs(y1 - y2) < 10:
-                horizontal_lines.append((x1, y1, x2, y2))
-                cv2.line(line_image, (x1, y1), (x2, y2), (0, 255, 0), 2)
-    
-    return line_image, horizontal_lines
+    return image_no_staff

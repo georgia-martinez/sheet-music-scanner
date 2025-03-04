@@ -1,6 +1,4 @@
 import os
-import cv2
-import numpy as np
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from datetime import datetime
@@ -26,9 +24,7 @@ def process_image():
 
         music = scan_music(file_path)
 
-        print(music)
-
-        return jsonify({"music": music})
+        return jsonify(music)
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
