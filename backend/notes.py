@@ -36,7 +36,7 @@ def get_closer(main_image, boxed_noteheads):
 
     return notehead_centers
 
-def notehead_coords(image, debug):
+def notehead_coords(image, staff_y, debug):
     """
     Returns coordinates of any found noteheads
 
@@ -47,12 +47,25 @@ def notehead_coords(image, debug):
     pattern_image = cv2.imread("templates/quarter-note.png", cv2.IMREAD_COLOR)
     pattern_gray = cv2.cvtColor(pattern_image, cv2.COLOR_BGR2GRAY)
 
-    scale = 1.2
+    height, _ = pattern_gray.shape
+
+    staff_line_y = [x for (index, x) in enumerate(staff_y) if index % 2 == 0]
+    staff_diff_y = []
+
+    for i in range(len(staff_line_y)-1):
+        diff = staff_line_y[i+1] - staff_line_y[i];
+        staff_diff_y.append(diff)
+
+    staff_mode_y = max(set(staff_diff_y), key=staff_diff_y.count)
+
+    scale = staff_mode_y / height
+
+    print(scale)
 
     resized_pattern = cv2.resize(pattern_gray, None, fx=scale, fy=scale, interpolation=cv2.INTER_AREA)
     result = cv2.matchTemplate(image, resized_pattern, cv2.TM_CCOEFF_NORMED)
 
-    threshold = 0.3
+    threshold = 0.8
     locations = np.where(result >= threshold)
 
     boxes = []

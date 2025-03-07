@@ -15,7 +15,7 @@ def scan_music(image_url, debug=False):
   # Standard step in OMR projects
   image_no_staff = remove_staff(image_gray, debug)
 
-  noteheads = notehead_coords(image_no_staff, debug)
+  noteheads = notehead_coords(image_no_staff, y_coords, debug)
 
   # Having the notes in this order is more readable
   # Reversed b/c OpenCV has (0, 0) in top left, higher the note -> lower y value
@@ -53,4 +53,4 @@ def scan_music(image_url, debug=False):
 
 
 if __name__ == "__main__":
-  scan_music("test.png", True)
+  scan_music("test2.png", True)
