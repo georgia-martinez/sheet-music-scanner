@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-def get_closer(main_image, boxed_noteheads):
+def note_head_center(main_image, boxed_noteheads):
     """
     Given an image and a list of boxes notehead coords, returns a list containing 
     the center of each found notehead
@@ -36,18 +36,8 @@ def get_closer(main_image, boxed_noteheads):
 
     return notehead_centers
 
-def notehead_coords(image, staff_y, debug):
-    """
-    Returns coordinates of any found noteheads
-
-    :param image:
-    :return: list of notehead coords e.g. [(x1, y1, x2, y2), (...), etc...]
-    """
-
-    pattern_image = cv2.imread("templates/quarter-note.png", cv2.IMREAD_COLOR)
-    pattern_gray = cv2.cvtColor(pattern_image, cv2.COLOR_BGR2GRAY)
-
-    height, _ = pattern_gray.shape
+def note_scale(note_template, staff_y):
+    height, _ = note_template.shape
 
     staff_line_y = [x for (index, x) in enumerate(staff_y) if index % 2 == 0]
     staff_diff_y = []
@@ -58,9 +48,20 @@ def notehead_coords(image, staff_y, debug):
 
     staff_mode_y = max(set(staff_diff_y), key=staff_diff_y.count)
 
-    scale = staff_mode_y / height
+    return staff_mode_y / height
 
-    print(scale)
+def note_head_coords(image, staff_y, debug):
+    """
+    Returns coordinates of any found note heads
+
+    :param image:
+    :return: list of notehead coords e.g. [(x1, y1, x2, y2), (...), etc...]
+    """
+
+    pattern_image = cv2.imread("templates/quarter-note.png", cv2.IMREAD_COLOR)
+    pattern_gray = cv2.cvtColor(pattern_image, cv2.COLOR_BGR2GRAY)
+
+    scale = note_scale(pattern_gray, staff_y)
 
     resized_pattern = cv2.resize(pattern_gray, None, fx=scale, fy=scale, interpolation=cv2.INTER_AREA)
     result = cv2.matchTemplate(image, resized_pattern, cv2.TM_CCOEFF_NORMED)
@@ -78,7 +79,7 @@ def notehead_coords(image, staff_y, debug):
     filtered_boxes = non_max_suppression(boxes, 0.1).tolist()
     filtered_boxes.sort(key=lambda box: box[0])
 
-    notehead_centers = get_closer(image, filtered_boxes)
+    note_head_centers = note_head_center(image, filtered_boxes)
 
     if debug:
         color_image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
@@ -86,14 +87,14 @@ def notehead_coords(image, staff_y, debug):
         for (x1, y1, x2, y2) in filtered_boxes:
             cv2.rectangle(color_image, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
-        for (x, y) in notehead_centers:
+        for (x, y) in note_head_centers:
             cv2.circle(color_image, (x, y), 1, (0, 0, 255), thickness=10)
 
         cv2.imshow('Matches', color_image)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
-    return notehead_centers
+    return note_head_centers
 
 def non_max_suppression(boxes, overlap_thresh):
     if len(boxes) == 0:

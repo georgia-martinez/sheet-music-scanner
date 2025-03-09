@@ -90,6 +90,8 @@ def remove_staff(image, debug=False):
 
     :param image:
     """
+    # Code from https://docs.opencv.org/4.x/dd/dd7/tutorial_morph_lines_detection.html
+
     # Apply adaptiveThreshold at the bitwise_not of gray
     image = cv2.bitwise_not(image)
     bw = cv2.adaptiveThreshold(image, 255, cv2.ADAPTIVE_THRESH_MEAN_C, \
