@@ -1,6 +1,11 @@
 import cv2
 import numpy as np
 
+def show_image(winname, img):
+    cv2.imshow(winname, img)
+    cv2.waitKey(0)
+    cv2.destroyWindow(winname)
+
 def horizontal_lines(image, threshold, min_line_length, max_line_gap):
     edges = cv2.Canny(image, 50, 150, apertureSize=3)
 
