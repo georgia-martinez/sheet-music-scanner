@@ -1,13 +1,16 @@
 import cv2
 
-from staff import staff_y_coords, remove_staff
+from staff import staff_y_coords, remove_staff, isolate_staffs
 from notes import note_head_coords
+
 
 def scan_music(image_url, debug=False):
   image = cv2.imread(image_url, cv2.IMREAD_COLOR)
 
   # Convert to gray for preprocessing
   image_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+  isolate_staffs(image_gray, debug)
 
   staff_y = staff_y_coords(image_gray, debug)
 
@@ -53,4 +56,4 @@ def scan_music(image_url, debug=False):
 
 
 if __name__ == "__main__":
-  scan_music("test2.png", True)
+  scan_music("test-multiline.png", False)
