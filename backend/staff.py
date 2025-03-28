@@ -121,32 +121,28 @@ def generate_y_histogram(image):
     y_histogram = np.sum(binary_image, axis=1)
 
     # Find peaks in the histogram (rows with high intensity)
-    threshold = np.max(y_histogram) * 0.5  # Consider rows above 50% of max value
+    threshold = np.max(y_histogram) * 0.7  # Consider rows above 50% of max value
     peak_indices = np.where(y_histogram > threshold)[0]
 
     # Reshape for clustering
     peak_points = np.array(peak_indices).reshape(-1, 1)
 
     # Apply DBSCAN clustering
-    dbscan = DBSCAN(eps=10, min_samples=5)  # eps controls max distance between peaks
+    dbscan = DBSCAN(eps=10, min_samples=2)  # eps controls max distance between peaks
     labels = dbscan.fit_predict(peak_points)
 
-    # Group clustered y-coordinates correctly
-    clustered
-    _bounds = []
-    unique_labels = set(labels)
-
-    for label in unique_labels:
+    # Group clustered y-coordinates (separate lines)
+    clustered_bounds = []
+    for label in set(labels):
         if label == -1:
             continue  # Ignore noise
-        cluster = peak_points[labels == label].flatten()  # Get only the y-values of the cluster
+        cluster = peak_points[labels == label].flatten()
         lower_bound = np.min(cluster)
         upper_bound = np.max(cluster)
         clustered_bounds.append((lower_bound, upper_bound))  # Store as (lower, upper) tuple
 
     # Sort the detected staff line clusters
     clustered_bounds.sort()
-
 
     # Plot the histogram with detected line regions
     plt.figure(figsize=(10, 5))
