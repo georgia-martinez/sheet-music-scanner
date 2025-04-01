@@ -87,72 +87,77 @@ def group_and_average(values, n):
     return grouped_values
 
 def isolate_staffs(image, debug=False):
-    # Code from https://docs.opencv.org/4.x/dd/dd7/tutorial_morph_lines_detection.html
-
-    # Apply adaptiveThreshold at the bitwise_not of gray
-    image = cv2.bitwise_not(image)
-    bw = cv2.adaptiveThreshold(image, 255, cv2.ADAPTIVE_THRESH_MEAN_C, \
+    inverted_image = cv2.bitwise_not(image)
+    bw = cv2.adaptiveThreshold(inverted_image, 255, cv2.ADAPTIVE_THRESH_MEAN_C, \
                                 cv2.THRESH_BINARY, 15, -2)
 
-    # Create the images that will use to extract the horizontal and vertical lines
     horizontal = np.copy(bw)
 
-    # Specify size on horizontal axis
     cols = horizontal.shape[1]
     horizontal_size = cols // 30
 
-    # Create structure element for extracting horizontal lines through morphology operations
     horizontalStructure = cv2.getStructuringElement(cv2.MORPH_RECT, (horizontal_size, 1))
 
-    # Apply morphology operations
     horizontal = cv2.erode(horizontal, horizontalStructure)
     horizontal = cv2.dilate(horizontal, horizontalStructure)
-    
+
     if debug: show_image("horizontal", horizontal)
 
-    print(generate_y_histogram(horizontal))
+    staff_bounds = find_staffs(horizontal)
 
-def generate_y_histogram(image):
-    
-    # Invert the image (optional) to ensure lines are detected correctly
-    _, binary_image = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+    _, width = image.shape[:2]
 
+    staff_images = []
+
+    for bounds in staff_bounds:
+        lower, upper = bounds
+
+        spacer = 100
+
+        cropped_image = image[lower-spacer:upper+spacer, 0:width]
+
+        staff_images.append(cropped_image)
+
+        show_image("cropped", cropped_image)
+
+    return staff_images
+
+def find_staffs(image):
     # Calculate the histogram (sum of white pixels along y-axis)
-    y_histogram = np.sum(binary_image, axis=1)
+    y_histogram = np.sum(image, axis=1)
 
     # Find peaks in the histogram (rows with high intensity)
-    threshold = np.max(y_histogram) * 0.7  # Consider rows above 50% of max value
+    threshold = np.max(y_histogram) * 0.5
     peak_indices = np.where(y_histogram > threshold)[0]
 
     # Reshape for clustering
     peak_points = np.array(peak_indices).reshape(-1, 1)
 
     # Apply DBSCAN clustering
-    dbscan = DBSCAN(eps=10, min_samples=2)  # eps controls max distance between peaks
+    dbscan = DBSCAN(eps=20, min_samples=1) 
     labels = dbscan.fit_predict(peak_points)
 
-    # Group clustered y-coordinates (separate lines)
+    # Group clustered y-coordinates (separate staffs)
     clustered_bounds = []
+    
     for label in set(labels):
         if label == -1:
             continue  # Ignore noise
         cluster = peak_points[labels == label].flatten()
         lower_bound = np.min(cluster)
         upper_bound = np.max(cluster)
-        clustered_bounds.append((lower_bound, upper_bound))  # Store as (lower, upper) tuple
+        clustered_bounds.append((lower_bound, upper_bound))
 
-    # Sort the detected staff line clusters
     clustered_bounds.sort()
 
-    # Plot the histogram with detected line regions
     plt.figure(figsize=(10, 5))
     plt.plot(range(len(y_histogram)), y_histogram, color='blue', label="Pixel Intensity")
-    plt.gca().invert_yaxis()  # Invert y-axis to match image orientation
+    plt.gca().invert_yaxis()
     plt.xlabel("Y-Coordinate")
     plt.ylabel("Pixel Intensity Sum")
     plt.title("Y-Axis Pixel Intensity Histogram")
 
-    # Overlay detected staff line regions
+    # Overlay clustered regions on histogram
     for (lower, upper) in clustered_bounds:
         plt.axvspan(lower, upper, color='red', alpha=0.3, label="Detected Line Region" if (lower, upper) == clustered_bounds[0] else "")
 
@@ -160,7 +165,6 @@ def generate_y_histogram(image):
     plt.show()
 
     return clustered_bounds  # Returns list of (lower_bound, upper_bound) pairs
-
 
 def remove_staff(image, debug=False):
     """
