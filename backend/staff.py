@@ -96,7 +96,6 @@ def isolate_staffs(image, debug=False):
 
     # Create the images that will use to extract the horizontal and vertical lines
     horizontal = np.copy(bw)
-    vertical = np.copy(bw)
 
     # Specify size on horizontal axis
     cols = horizontal.shape[1]
@@ -108,9 +107,10 @@ def isolate_staffs(image, debug=False):
     # Apply morphology operations
     horizontal = cv2.erode(horizontal, horizontalStructure)
     horizontal = cv2.dilate(horizontal, horizontalStructure)
+    
     if debug: show_image("horizontal", horizontal)
 
-    print(generate_y_histogram(image))
+    print(generate_y_histogram(horizontal))
 
 def generate_y_histogram(image):
     
