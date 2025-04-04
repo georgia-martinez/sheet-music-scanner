@@ -1,7 +1,8 @@
 import cv2
 
-from staff import staff_y_coords, remove_staff
+from staff import staff_y_coords, remove_staff, isolate_staffs, horizontal_image
 from notes import note_head_coords
+
 
 def scan_music(image_url, debug=False):
   image = cv2.imread(image_url, cv2.IMREAD_COLOR)
@@ -9,48 +10,52 @@ def scan_music(image_url, debug=False):
   # Convert to gray for preprocessing
   image_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-  staff_y = staff_y_coords(image_gray, debug)
+  staff_images = isolate_staffs(image_gray, debug)
 
-  # Remove staff lines before trying to find notes
-  # Standard step in OMR projects
-  image_no_staff = remove_staff(image_gray, debug)
+  for staff_image in staff_images:
+    horizontal = horizontal_image(staff_image)
 
-  note_heads = note_head_coords(image_no_staff, staff_y, debug)
+    staff_y = staff_y_coords(horizontal, debug)
 
-  # Having the notes in this order is more readable
-  # Reversed b/c OpenCV has (0, 0) in top left, higher the note -> lower y value
-  note_letters = ["E4", "F4", "G4", "A4", "B4", "C5", "D5", "E5", "F5"]
-  note_letters.reverse()
+    # Remove staff lines before trying to find notes
+    # Standard step in OMR projects
+    image_no_staff = remove_staff(staff_image, debug)
 
-  note_map = dict(zip(staff_y, note_letters))
+    note_heads = note_head_coords(image_no_staff, staff_y, debug)
 
-  notes = []
-  note_names = []
+    # Having the notes in this order is more readable
+    # Reversed b/c OpenCV has (0, 0) in top left, higher the note -> lower y value
+    note_letters = ["E4", "F4", "G4", "A4", "B4", "C5", "D5", "E5", "F5"]
+    note_letters.reverse()
 
-  print(f"# of notes found: {len(note_heads)}")
-  print(f"Staff y coords: {staff_y}")
+    note_map = dict(zip(staff_y, note_letters))
 
-  for index, notehead_center in enumerate(note_heads):
-    center_x, center_y = notehead_center
+    notes = []
+    note_names = []
 
-    closest_y = min(staff_y, key=lambda y: abs(y - center_y))
+    print(f"# of notes found: {len(note_heads)}")
+    print(f"Staff y coords: {staff_y}")
 
-    note_name = note_map[closest_y]
+    for index, notehead_center in enumerate(note_heads):
+      _, center_y = notehead_center
 
-    note_data = { "note": note_name, "duration": "4n", "time": index }
+      closest_y = min(staff_y, key=lambda y: abs(y - center_y))
 
-    note_names.append(note_name)
-    notes.append(note_data)
+      note_name = note_map[closest_y]
 
-  print(note_names)
+      note_data = { "note": note_name, "duration": "4n", "time": index }
 
-  data = {
-    "bpm": 80,
-    "notes": notes
-  }
+      note_names.append(note_name)
+      notes.append(note_data)
 
-  return data
+    print(note_names)
 
+    data = {
+      "bpm": 80,
+      "notes": notes
+    }
+
+    # TODO: Send data to frontend
 
 if __name__ == "__main__":
-  scan_music("test2.png", True)
+  scan_music("test-multiline2.png", False)
