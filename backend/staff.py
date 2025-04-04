@@ -112,7 +112,7 @@ def isolate_staffs(image, debug=False):
     for bounds in staff_bounds:
         lower, upper = bounds
 
-        spacer = 100
+        spacer = upper - lower
 
         cropped_image = image[lower-spacer:upper+spacer, 0:width]
 
@@ -152,7 +152,6 @@ def find_staffs(image):
 
     plt.figure(figsize=(10, 5))
     plt.plot(range(len(y_histogram)), y_histogram, color='blue', label="Pixel Intensity")
-    plt.gca().invert_yaxis()
     plt.xlabel("Y-Coordinate")
     plt.ylabel("Pixel Intensity Sum")
     plt.title("Y-Axis Pixel Intensity Histogram")
@@ -164,7 +163,7 @@ def find_staffs(image):
     plt.legend()
     plt.show()
 
-    return clustered_bounds  # Returns list of (lower_bound, upper_bound) pairs
+    return clustered_bounds
 
 def remove_staff(image, debug=False):
     """
@@ -173,28 +172,13 @@ def remove_staff(image, debug=False):
     :param image:
     """
     # Code from https://docs.opencv.org/4.x/dd/dd7/tutorial_morph_lines_detection.html
-
     # Apply adaptiveThreshold at the bitwise_not of gray
-    image = cv2.bitwise_not(image)
-    bw = cv2.adaptiveThreshold(image, 255, cv2.ADAPTIVE_THRESH_MEAN_C, \
+    inverted_image = cv2.bitwise_not(image)
+    bw = cv2.adaptiveThreshold(inverted_image, 255, cv2.ADAPTIVE_THRESH_MEAN_C, \
                                 cv2.THRESH_BINARY, 15, -2)
 
-    # Create the images that will use to extract the horizontal and vertical lines
-    horizontal = np.copy(bw)
+    # Create the images that will use to extract the vertical lines
     vertical = np.copy(bw)
-
-    # Specify size on horizontal axis
-    cols = horizontal.shape[1]
-    horizontal_size = cols // 30
-
-    # Create structure element for extracting horizontal lines through morphology operations
-    horizontalStructure = cv2.getStructuringElement(cv2.MORPH_RECT, (horizontal_size, 1))
-
-    # Apply morphology operations
-    horizontal = cv2.erode(horizontal, horizontalStructure)
-    horizontal = cv2.dilate(horizontal, horizontalStructure)
-
-    if debug: show_image("horizontal", horizontal)
 
     # Specify size on vertical axis
     rows = vertical.shape[0]

@@ -35,7 +35,7 @@ def scan_music(image_url, debug=False):
     print(f"Staff y coords: {staff_y}")
 
     for index, notehead_center in enumerate(note_heads):
-      center_x, center_y = notehead_center
+      _, center_y = notehead_center
 
       closest_y = min(staff_y, key=lambda y: abs(y - center_y))
 
@@ -53,8 +53,7 @@ def scan_music(image_url, debug=False):
       "notes": notes
     }
 
-    return data
-
+    # TODO: Send data to frontend
 
 if __name__ == "__main__":
   scan_music("test-multiline.png", True)
