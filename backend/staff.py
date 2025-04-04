@@ -24,7 +24,7 @@ def staff_y_coords(image, debug):
     line_y_coords = list(line_y_coords);
     line_y_coords.sort()
 
-    line_y_coords = group_and_average(line_y_coords, 5)
+    line_y_coords = combine_y_coords(line_y_coords, 3)
 
     space_y_coords = staff_space_y_coords(line_y_coords)
 
@@ -63,6 +63,25 @@ def staff_space_y_coords(line_y_coords):
 
     return result;
 
+def combine_y_coords(y_coords, tolerance):
+    y_coords = sorted(y_coords)
+    combined = []
+    group = [y_coords[0]]
+
+    for y in y_coords[1:]:
+        if abs(y - group[-1]) <= tolerance:
+            group.append(y)
+        else:
+            avg = round(sum(group) / len(group))
+            combined.append(avg)
+            group = [y]
+    
+    # Add the last group
+    avg = round(sum(group) / len(group))
+    combined.append(avg)
+
+    return combined
+
 def group_and_average(values, n):
     if len(values) <= n:
         return values
@@ -85,6 +104,27 @@ def group_and_average(values, n):
         grouped_values[-1] = int(np.mean([grouped_values[-1], last]))
     
     return grouped_values
+
+def horizontal_image(image): 
+    inverted_image = cv2.bitwise_not(image)
+    bw = cv2.adaptiveThreshold(inverted_image, 255, cv2.ADAPTIVE_THRESH_MEAN_C, \
+                                cv2.THRESH_BINARY, 15, -2)
+
+    horizontal = np.copy(bw)
+
+    cols = horizontal.shape[1]
+    horizontal_size = cols // 30
+
+    horizontalStructure = cv2.getStructuringElement(cv2.MORPH_RECT, (horizontal_size, 1))
+
+    horizontal = cv2.erode(horizontal, horizontalStructure)
+    horizontal = cv2.dilate(horizontal, horizontalStructure)
+
+    uninverted_image =  cv2.bitwise_not(horizontal)
+
+    show_image("horizontal", uninverted_image)
+
+    return uninverted_image
 
 def isolate_staffs(image, debug=False):
     inverted_image = cv2.bitwise_not(image)
@@ -112,7 +152,7 @@ def isolate_staffs(image, debug=False):
     for bounds in staff_bounds:
         lower, upper = bounds
 
-        spacer = upper - lower
+        spacer = 45
 
         cropped_image = image[lower-spacer:upper+spacer, 0:width]
 

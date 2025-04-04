@@ -1,6 +1,6 @@
 import cv2
 
-from staff import staff_y_coords, remove_staff, isolate_staffs
+from staff import staff_y_coords, remove_staff, isolate_staffs, horizontal_image
 from notes import note_head_coords
 
 
@@ -13,7 +13,9 @@ def scan_music(image_url, debug=False):
   staff_images = isolate_staffs(image_gray, debug)
 
   for staff_image in staff_images:
-    staff_y = staff_y_coords(staff_image, debug)
+    horizontal = horizontal_image(staff_image)
+
+    staff_y = staff_y_coords(horizontal, debug)
 
     # Remove staff lines before trying to find notes
     # Standard step in OMR projects
@@ -56,4 +58,4 @@ def scan_music(image_url, debug=False):
     # TODO: Send data to frontend
 
 if __name__ == "__main__":
-  scan_music("test-multiline.png", True)
+  scan_music("test-multiline2.png", False)
