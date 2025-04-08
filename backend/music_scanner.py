@@ -12,6 +12,8 @@ def scan_music(image_url, debug=False):
 
   staff_images = isolate_staffs(image_gray, debug)
 
+  results = []
+  
   for staff_image in staff_images:
     horizontal = horizontal_image(staff_image)
 
@@ -47,6 +49,9 @@ def scan_music(image_url, debug=False):
 
       note_names.append(note_name)
       notes.append(note_data)
+      
+    results.extend(note_names)
+      
 
     print(note_names)
 
@@ -54,8 +59,8 @@ def scan_music(image_url, debug=False):
       "bpm": 80,
       "notes": notes
     }
-
-    # TODO: Send data to frontend
+    print(results)
+    return results
 
 if __name__ == "__main__":
-  scan_music("test.png", False)
+  scan_music("test/test.png", False)

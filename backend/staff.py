@@ -122,7 +122,7 @@ def horizontal_image(image):
 
     uninverted_image =  cv2.bitwise_not(horizontal)
 
-    show_image("horizontal", uninverted_image)
+#     show_image("horizontal", uninverted_image)
 
     return uninverted_image
 
@@ -158,7 +158,7 @@ def isolate_staffs(image, debug=False):
 
         staff_images.append(cropped_image)
 
-        show_image("cropped", cropped_image)
+#         show_image("cropped", cropped_image)
 
     return staff_images
 
@@ -201,7 +201,7 @@ def find_staffs(image):
         plt.axvspan(lower, upper, color='red', alpha=0.3, label="Detected Line Region" if (lower, upper) == clustered_bounds[0] else "")
 
     plt.legend()
-    plt.show()
+#   plt.show()
 
     return clustered_bounds
 
