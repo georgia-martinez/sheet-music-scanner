@@ -58,4 +58,4 @@ def scan_music(image_url, debug=False):
     # TODO: Send data to frontend
 
 if __name__ == "__main__":
-  scan_music("test-multiline2.png", False)
+  scan_music("test.png", False)

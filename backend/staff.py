@@ -21,7 +21,7 @@ def staff_y_coords(image, debug):
 
         line_y_coords.add(y1)
 
-    line_y_coords = list(line_y_coords);
+    line_y_coords = list(line_y_coords)
     line_y_coords.sort()
 
     line_y_coords = combine_y_coords(line_y_coords, 3)
@@ -57,11 +57,11 @@ def staff_space_y_coords(line_y_coords):
         if i == len(line_y_coords)-1:
             break
         
-        middle = int((line_y_coords[i+1] + line_y_coords[i]) / 2);
+        middle = int((line_y_coords[i+1] + line_y_coords[i]) / 2)
 
         result.append(middle)
 
-    return result;
+    return result
 
 def combine_y_coords(y_coords, tolerance):
     y_coords = sorted(y_coords)
@@ -151,8 +151,8 @@ def isolate_staffs(image, debug=False):
 
     for bounds in staff_bounds:
         lower, upper = bounds
-
-        spacer = 45
+    
+        spacer = int((upper - lower) / 2)
 
         cropped_image = image[lower-spacer:upper+spacer, 0:width]
 
