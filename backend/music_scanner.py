@@ -49,6 +49,7 @@ def scan_music(image_url, debug=False):
 
       note_names.append(note_name)
       notes.append(note_data)
+    
       
     results.extend(note_names)
       
@@ -59,8 +60,7 @@ def scan_music(image_url, debug=False):
       "bpm": 80,
       "notes": notes
     }
-    print(results)
-    return results
+  return results
 
 if __name__ == "__main__":
-  scan_music("test/test.png", False)
+  scan_music("test/test-multiline.png", False)

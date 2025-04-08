@@ -60,7 +60,6 @@ def note_head_coords(image, staff_y, debug):
     """
     
     template_path = os.path.join(os.path.dirname(__file__), "templates", "quarter-note.png")
-    print(f"Template path: {template_path}")
         
     pattern_image = cv2.imread(template_path, cv2.IMREAD_COLOR)
     pattern_gray = cv2.cvtColor(pattern_image, cv2.COLOR_BGR2GRAY)
