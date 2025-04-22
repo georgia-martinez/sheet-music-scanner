@@ -1,4 +1,5 @@
 import cv2
+import argparse
 
 from staff import staff_y_coords, remove_staff
 from notes import note_head_coords
@@ -53,4 +54,9 @@ def scan_music(image_url, debug=False):
 
 
 if __name__ == "__main__":
-  scan_music("test2.png", True)
+  parser = argparse.ArgumentParser(prog='music_scanner')
+  parser.add_argument("filename", help="Path to the input file")
+
+  args = parser.parse_args()
+
+  scan_music(args.filename, True)
