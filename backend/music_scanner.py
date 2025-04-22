@@ -1,5 +1,7 @@
 import cv2
 import argparse
+import yaml
+import os
 
 from staff import staff_y_coords, remove_staff
 from notes import note_head_coords
@@ -52,6 +54,15 @@ def scan_music(image_url, debug=False):
 
   return data
 
+def load_env_from_yaml(file_path):
+    with open(file_path, 'r') as stream:
+        try:
+            config = yaml.safe_load(stream)
+            for key, value in config.items():
+                os.environ[key] = str(value)
+        except yaml.YAMLError as exc:
+            print(f"Error loading YAML file: {exc}")
+
 
 if __name__ == "__main__":
   parser = argparse.ArgumentParser(prog='music_scanner')
@@ -59,4 +70,7 @@ if __name__ == "__main__":
 
   args = parser.parse_args()
 
+  load_env_from_yaml("config.yaml")
+
   scan_music(args.filename, True)
+

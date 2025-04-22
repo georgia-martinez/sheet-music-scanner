@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import os
 
 from utils import show_image, horizontal_lines
 
@@ -19,7 +20,7 @@ def staff_y_coords(image, debug):
 
         line_y_coords.add(y1)
 
-    line_y_coords = list(line_y_coords);
+    line_y_coords = list(line_y_coords)
     line_y_coords.sort()
 
     line_y_coords = group_and_average(line_y_coords, 5)
@@ -29,7 +30,7 @@ def staff_y_coords(image, debug):
     all_y_coords = (line_y_coords + space_y_coords)
     all_y_coords.sort()
 
-    if debug:
+    if os.environ["FOUND_STAFF_LINES"] == "true":
         color_image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
 
         for y in all_y_coords:
@@ -59,7 +60,7 @@ def staff_space_y_coords(line_y_coords):
 
         result.append(middle)
 
-    return result;
+    return result
 
 def group_and_average(values, n):
     if len(values) <= n:
