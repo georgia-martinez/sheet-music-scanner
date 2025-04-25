@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import os
 
 def note_head_center(main_image, boxed_noteheads):
     """
@@ -50,7 +51,7 @@ def note_scale(note_template, staff_y):
 
     return staff_mode_y / height
 
-def note_head_coords(image, staff_y, debug):
+def note_head_coords(image, staff_y):
     """
     Returns coordinates of any found note heads
 
@@ -81,7 +82,8 @@ def note_head_coords(image, staff_y, debug):
 
     note_head_centers = note_head_center(image, filtered_boxes)
 
-    if debug:
+    print(os.environ["FOUND_NOTE_HEADS"])
+    if os.environ["FOUND_NOTE_HEADS"] == "True":
         color_image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
 
         for (x1, y1, x2, y2) in filtered_boxes:

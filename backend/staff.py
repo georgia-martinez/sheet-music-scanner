@@ -4,7 +4,7 @@ import os
 
 from utils import show_image, horizontal_lines
 
-def staff_y_coords(image, debug):
+def staff_y_coords(image):
     """
     Returns the y coords for the 5 lines in the staff
 
@@ -30,7 +30,7 @@ def staff_y_coords(image, debug):
     all_y_coords = (line_y_coords + space_y_coords)
     all_y_coords.sort()
 
-    if os.environ["FOUND_STAFF_LINES"] == "true":
+    if os.environ["FOUND_STAFF_LINES"] == "True":
         color_image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
 
         for y in all_y_coords:
@@ -85,12 +85,15 @@ def group_and_average(values, n):
     
     return grouped_values
 
-def remove_staff(image, debug=False):
+def remove_staff(image):
     """
     Removes staff line from given image
 
     :param image:
     """
+    debug = os.environ["REMOVE_STAFF_LINES"] == "True"
+    print(debug)
+
     # Code from https://docs.opencv.org/4.x/dd/dd7/tutorial_morph_lines_detection.html
 
     # Apply adaptiveThreshold at the bitwise_not of gray
