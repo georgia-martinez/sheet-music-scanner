@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import * as Tone from "tone";
 import './App.css'
+import {css} from '../styled-system/css'
 
 const App = () => {
   const [message, setMessage] = useState("");
@@ -49,8 +50,8 @@ const App = () => {
   // }
 
   return (
-      <div>
-        <h1>Sheet Music Scanner</h1>
+      <div className={css({backgroundColor: "#02A9EA"})}>
+        <h1 >Sheet Music Scanner</h1>
         <input type="file" onChange={handleFileUpload} />
         <p>{message}</p>
         <button class="white-key">E</button>
